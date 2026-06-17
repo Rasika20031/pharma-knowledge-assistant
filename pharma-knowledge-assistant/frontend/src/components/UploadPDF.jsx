@@ -3,17 +3,25 @@ import API from "../services/api";
 
 function UploadPDF() {
 
-    const [file, setFile] = useState(null);
-    const [message, setMessage] = useState("");
+    const [file, setFile] =
+        useState(null);
+
+    const [message, setMessage] =
+        useState("");
 
     const uploadFile = async () => {
 
         if (!file) {
-            setMessage("Please select a PDF");
+
+            setMessage(
+                "⚠️ Please select a PDF file."
+            );
+
             return;
         }
 
-        const formData = new FormData();
+        const formData =
+            new FormData();
 
         formData.append(
             "file",
@@ -22,7 +30,7 @@ function UploadPDF() {
 
         try {
 
-            const response = await API.post(
+            await API.post(
                 "/upload",
                 formData,
                 {
@@ -34,7 +42,7 @@ function UploadPDF() {
             );
 
             setMessage(
-                response.data.message
+                `✅ ${file.name} uploaded successfully!`
             );
 
         } catch (error) {
@@ -42,32 +50,137 @@ function UploadPDF() {
             console.error(error);
 
             setMessage(
-                "Upload failed"
+                "❌ Upload failed. Please try again."
             );
         }
+
     };
 
     return (
-        <div>
 
-            <h2>Upload PDF</h2>
+        <div
+            style={{
+                backgroundColor:
+                    "#ffffff",
 
-            <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) =>
-                    setFile(e.target.files[0])
-                }
-            />
+                border:
+                    "1px solid #e5e7eb",
 
-            <button onClick={uploadFile}>
-                Upload
-            </button>
+                borderRadius:
+                    "12px",
 
-            <p>{message}</p>
+                padding:
+                    "20px",
+
+                marginBottom:
+                    "20px",
+
+                boxShadow:
+                    "0 2px 8px rgba(0,0,0,0.05)"
+            }}
+        >
+
+            <h3
+                style={{
+                    marginTop: 0
+                }}
+            >
+                📄 Upload PDF
+            </h3>
+
+            <div
+                style={{
+                    display: "flex",
+                    gap: "10px",
+                    alignItems:
+                        "center"
+                }}
+            >
+
+                <input
+                    type="file"
+                    accept=".pdf"
+
+                    onChange={(e) =>
+                        setFile(
+                            e.target.files[0]
+                        )
+                    }
+                />
+
+                <button
+                    onClick={
+                        uploadFile
+                    }
+
+                    style={{
+                        backgroundColor:
+                            "#2563eb",
+
+                        color:
+                            "white",
+
+                        border:
+                            "none",
+
+                        padding:
+                            "10px 18px",
+
+                        borderRadius:
+                            "8px",
+
+                        cursor:
+                            "pointer"
+                    }}
+                >
+                    Upload
+                </button>
+
+            </div>
+
+            {
+                file && (
+
+                    <p
+                        style={{
+                            color:
+                                "#6b7280",
+                            marginTop:
+                                "10px"
+                        }}
+                    >
+                        Selected:
+                        {" "}
+                        <strong>
+                            {file.name}
+                        </strong>
+                    </p>
+
+                )
+            }
+
+            {
+                message && (
+
+                    <p
+                        style={{
+                            marginTop:
+                                "12px",
+
+                            fontWeight:
+                                "500"
+                        }}
+                    >
+                        {message}
+                    </p>
+
+                )
+            }
 
         </div>
+
     );
+
 }
 
 export default UploadPDF;

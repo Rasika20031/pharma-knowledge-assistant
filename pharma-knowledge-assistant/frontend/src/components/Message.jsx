@@ -1,31 +1,56 @@
 function Message({ message }) {
 
-    const isUser = message.type === "user";
+    const isUser =
+        message.type === "user";
 
     return (
+
         <div
             style={{
                 display: "flex",
-                justifyContent: isUser
-                    ? "flex-end"
-                    : "flex-start",
-                marginBottom: "15px"
+                justifyContent:
+                    isUser
+                        ? "flex-end"
+                        : "flex-start",
+                marginBottom: "20px"
             }}
         >
+
             <div
                 style={{
-                    backgroundColor: isUser
-                        ? "#2563eb"
-                        : "#f1f5f9",
-                    color: isUser
-                        ? "white"
-                        : "black",
-                    padding: "12px",
-                    borderRadius: "12px",
-                    maxWidth: "70%"
+                    backgroundColor:
+                        isUser
+                            ? "#2563eb"
+                            : "#ffffff",
+
+                    color:
+                        isUser
+                            ? "white"
+                            : "#1f2937",
+
+                    padding: "14px 16px",
+
+                    borderRadius:
+                        "16px",
+
+                    maxWidth: "75%",
+
+                    boxShadow:
+                        "0 2px 8px rgba(0,0,0,0.08)",
+
+                    border:
+                        isUser
+                            ? "none"
+                            : "1px solid #e5e7eb"
                 }}
             >
-                <div>
+
+                <div
+                    style={{
+                        fontSize: "14px",
+                        lineHeight: "1.6"
+                    }}
+                >
                     {message.text}
                 </div>
 
@@ -35,13 +60,17 @@ function Message({ message }) {
 
                         <div
                             style={{
-                                marginTop: "10px",
-                                fontSize: "12px"
+                                marginTop: "12px",
+                                paddingTop: "10px",
+                                borderTop:
+                                    "1px solid #d1d5db",
+                                fontSize: "12px",
+                                color: "#6b7280"
                             }}
                         >
 
                             <strong>
-                                Sources
+                                📚 Sources
                             </strong>
 
                             {
@@ -51,10 +80,36 @@ function Message({ message }) {
                                         index
                                     ) => (
 
-                                        <div key={index}>
-                                            📄 {source.document}
-                                            {" | "}
-                                            Page {source.page}
+                                        <div
+                                            key={index}
+                                            style={{
+                                                marginTop:
+                                                    "6px"
+                                            }}
+                                        >
+
+                                            📄
+                                            {" "}
+                                            {
+                                                source.document
+                                            }
+
+                                            {
+                                                source.page &&
+                                                (
+                                                    <>
+                                                        {" "}
+                                                        |
+                                                        {" "}
+                                                        Page
+                                                        {" "}
+                                                        {
+                                                            source.page
+                                                        }
+                                                    </>
+                                                )
+                                            }
+
                                         </div>
 
                                     )
@@ -67,8 +122,11 @@ function Message({ message }) {
                 }
 
             </div>
+
         </div>
+
     );
+
 }
 
 export default Message;

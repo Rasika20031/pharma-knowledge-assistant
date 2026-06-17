@@ -5,29 +5,30 @@ import UploadPDF from "./components/UploadPDF";
 import ChatWindow from "./components/ChatWindow";
 import InputBox from "./components/InputBox";
 
-
-const [sessionId] = useState(() => {
-
-    let id =
-        localStorage.getItem(
-            "session_id"
-        );
-
-    if (!id) {
-
-        id =
-            crypto.randomUUID();
-
-        localStorage.setItem(
-            "session_id",
-            id
-        );
-    }
-
-    return id;
-});
-
 function App() {
+
+    // Session ID persists across refreshes
+    const [sessionId] = useState(() => {
+
+        let id =
+            localStorage.getItem(
+                "session_id"
+            );
+
+        if (!id) {
+
+            id =
+                crypto.randomUUID();
+
+            localStorage.setItem(
+                "session_id",
+                id
+            );
+        }
+
+        return id;
+
+    });
 
     const [question, setQuestion] =
         useState("");
@@ -69,18 +70,19 @@ function App() {
 
             let botMessage;
 
-            // GREETING / SHORT_VAGUE / OUT_OF_SCOPE
+            // Greeting / Short vague / Out of scope
             if (response.data.answer) {
 
                 botMessage = {
                     type: "assistant",
-                    text: response.data.answer,
+                    text:
+                        response.data.answer,
                     sources: []
                 };
 
             }
 
-            // RAG / SQL / TOOL RESPONSES
+            // RAG / SQL response
             else if (
                 response.data.results &&
                 response.data.results.length > 0
@@ -92,7 +94,8 @@ function App() {
 
                 botMessage = {
                     type: "assistant",
-                    text: result.answer,
+                    text:
+                        result.answer,
                     sources:
                         result.sources || []
                 };
@@ -136,6 +139,7 @@ function App() {
         }
 
         setQuestion("");
+
     };
 
     return (
@@ -151,6 +155,17 @@ function App() {
             <h1>
                 Pharma Knowledge Assistant
             </h1>
+
+            <p
+                style={{
+                    color: "gray",
+                    fontSize: "12px"
+                }}
+            >
+                Session:
+                {" "}
+                {sessionId.slice(0, 8)}
+            </p>
 
             <UploadPDF />
 
