@@ -3,18 +3,20 @@ import API from "../services/api";
 
 function UploadPDF() {
 
-    const [file, setFile] =
-        useState(null);
+    const [files, setFiles] =
+        useState([]);
 
     const [message, setMessage] =
         useState("");
 
     const uploadFile = async () => {
 
-        if (!file) {
+        if (
+            files.length === 0
+        ) {
 
             setMessage(
-                "⚠️ Please select a PDF file."
+                "⚠️ Please select PDF files."
             );
 
             return;
@@ -23,35 +25,47 @@ function UploadPDF() {
         const formData =
             new FormData();
 
-        formData.append(
-            "file",
-            file
-        );
+        for (
+            let i = 0;
+            i < files.length;
+            i++
+        ) {
+
+            formData.append(
+                "files",
+                files[i]
+            );
+
+        }
 
         try {
 
-            await API.post(
-                "/upload",
-                formData,
-                {
-                    headers: {
-                        "Content-Type":
-                            "multipart/form-data"
+            const response =
+                await API.post(
+                    "/upload",
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type":
+                                "multipart/form-data"
+                        }
                     }
-                }
-            );
+                );
 
             setMessage(
-                `✅ ${file.name} uploaded successfully!`
+                `✅ ${response.data.uploaded_files.length} PDF(s) uploaded successfully!`
             );
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
 
             setMessage(
                 "❌ Upload failed. Please try again."
             );
+
         }
 
     };
@@ -85,7 +99,7 @@ function UploadPDF() {
                     marginTop: 0
                 }}
             >
-                📄 Upload PDF
+                📄 Upload PDFs
             </h3>
 
             <div
@@ -99,11 +113,16 @@ function UploadPDF() {
 
                 <input
                     type="file"
+
                     accept=".pdf"
 
+                    multiple
+
                     onChange={(e) =>
-                        setFile(
-                            e.target.files[0]
+                        setFiles(
+                            Array.from(
+                                e.target.files
+                            )
                         )
                     }
                 />
@@ -139,22 +158,46 @@ function UploadPDF() {
             </div>
 
             {
-                file && (
+                files.length > 0 && (
 
-                    <p
+                    <div
                         style={{
-                            color:
-                                "#6b7280",
                             marginTop:
-                                "10px"
+                                "10px",
+
+                            color:
+                                "#6b7280"
                         }}
                     >
-                        Selected:
-                        {" "}
+
                         <strong>
-                            {file.name}
+                            Selected:
                         </strong>
-                    </p>
+
+                        {
+                            files.map(
+                                (
+                                    file,
+                                    index
+                                ) => (
+
+                                    <div
+                                        key={
+                                            index
+                                        }
+                                    >
+                                        📄
+                                        {" "}
+                                        {
+                                            file.name
+                                        }
+                                    </div>
+
+                                )
+                            )
+                        }
+
+                    </div>
 
                 )
             }

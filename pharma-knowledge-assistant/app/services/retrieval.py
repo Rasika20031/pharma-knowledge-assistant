@@ -1,41 +1,52 @@
-# from app.db.chroma_db import get_collection
-
-
-# # def retrieve_context(question: str):
-
-# #     collection = get_collection()
-
-# #     results = collection.query(
-# #         query_texts=[question],
-# #         n_results=3
-# #     )
-
-# #     docs = results["documents"][0]
-
-# #     return "\n".join(docs)
-
+from app.db.chroma_db import get_collection
+from app.services.embedding import get_embedding
 
 
 # def retrieve_context(question: str):
 
 #     collection = get_collection()
 
-#     results = collection.query(
-#         query_texts=[question],
-#         n_results=3
+#     question_embedding = get_embedding(
+#         question
 #     )
 
-#     documents = results["documents"][0]
-#     metadata = results["metadatas"][0]
+#     results = collection.query(
+#         query_embeddings=[
+#             question_embedding
+#         ],
+#         n_results=5,
+#         include=[
+#             "documents",
+#             "metadatas",
+#             "distances"
+#         ]
+#     )
 
-#     return {
-#         "documents": documents,
-#         "metadata": metadata
-#     }
+#     documents = []
+#     metadata = []
+
+#     # Smaller distance = better match
+#     THRESHOLD = 1.5
+
+#     for doc, meta, dist in zip(
+#         results["documents"][0],
+#         results["metadatas"][0],
+#         results["distances"][0]
+#     ):
+
+#         if dist <= THRESHOLD:
+
+#             documents.append(doc)
+#             metadata.append(meta)
+
+#     return documents, metadata
+
+
+
 
 from app.db.chroma_db import get_collection
-# from app.services.embedding import generate_embedding
 from app.services.embedding import get_embedding
+
 
 def retrieve_context(question: str):
 
@@ -49,10 +60,46 @@ def retrieve_context(question: str):
         query_embeddings=[
             question_embedding
         ],
-        n_results=3
+        n_results=5,
+        include=[
+            "documents",
+            "metadatas",
+            "distances"
+        ]
     )
 
-    documents = results["documents"][0]
-    metadata = results["metadatas"][0]
+    print(
+        "\nQUESTION:",
+        question
+    )
+
+    print(
+        "\nDISTANCES:",
+        results["distances"][0]
+    )
+
+    print(
+        "\nSOURCES:"
+    )
+
+    for meta in results["metadatas"][0]:
+
+        print(meta)
+
+    documents = []
+    metadata = []
+
+    THRESHOLD = 1.5
+
+    for doc, meta, dist in zip(
+        results["documents"][0],
+        results["metadatas"][0],
+        results["distances"][0]
+    ):
+
+        if dist <= THRESHOLD:
+
+            documents.append(doc)
+            metadata.append(meta)
 
     return documents, metadata

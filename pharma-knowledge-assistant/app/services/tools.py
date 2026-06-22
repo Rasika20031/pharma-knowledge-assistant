@@ -4,14 +4,41 @@ from app.services.generation import generate_answer
 from app.services.sql_generator import generate_sql
 from app.services.sql_executor import execute_sql
 from app.services.sql_answer_generator import generate_sql_answer
-
+from app.services.query_rewriter import (
+    rewrite_query
+)
 import os
+
 
 
 def rag_tool(question: str):
 
+    rewritten_question = (
+        rewrite_query(
+            question
+        )
+    )
+
+    print("\n" + "=" * 50)
+
+    print(
+        "ORIGINAL QUESTION:"
+    )
+
+    print(question)
+
+    print(
+        "\nREWRITTEN QUESTION:"
+    )
+
+    print(
+        rewritten_question
+    )
+
+    print("=" * 50)
+
     documents, metadata = retrieve_context(
-        question
+        rewritten_question
     )
 
     context = "\n".join(
@@ -41,7 +68,10 @@ def rag_tool(question: str):
 
             source_info = {
                 "document": os.path.basename(
-                    item.get("source", "")
+                    item.get(
+                        "source",
+                        ""
+                    )
                 ),
                 "page": item.get(
                     "page",
@@ -49,7 +79,10 @@ def rag_tool(question: str):
                 )
             }
 
-            if source_info not in unique_sources:
+            if (
+                source_info
+                not in unique_sources
+            ):
 
                 unique_sources.append(
                     source_info
@@ -57,8 +90,9 @@ def rag_tool(question: str):
 
     return {
         "answer": answer,
-        "sources": unique_sources
+        "sources": unique_sources[:1]
     }
+
 
 
 def sql_tool(question: str):
