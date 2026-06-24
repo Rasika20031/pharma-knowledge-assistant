@@ -1,6 +1,5 @@
 import sqlite3
 
-
 def save_memory(
     session_id,
     question,
@@ -12,6 +11,32 @@ def save_memory(
     )
 
     cursor = conn.cursor()
+
+    # Check if same question already exists
+    cursor.execute(
+        """
+        SELECT id
+        FROM chat_memory
+        WHERE session_id = ?
+        AND question = ?
+        """,
+        (
+            session_id,
+            question
+        )
+    )
+
+    existing = cursor.fetchone()
+
+    if existing:
+
+        print(
+            "Memory already exists. Skipping..."
+        )
+
+        conn.close()
+
+        return
 
     cursor.execute(
         """
@@ -32,6 +57,8 @@ def save_memory(
 
     conn.commit()
     conn.close()
+
+
 
 
 def get_memory(

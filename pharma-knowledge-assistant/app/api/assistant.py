@@ -38,9 +38,105 @@ def assistant(request: AssistantRequest):
     print(f"Session ID: {session_id}")
     print(f"Memory Size: {len(memory)}")
 
-    # Intent Classification
+    print("\nMEMORY:")
+    print(memory)
+
+    # ------------------------
+    # FOLLOW-UP DETECTION
+    # ------------------------
+
+    # question = request.question
+
+    # follow_up_words = [
+    #     "it",
+    #     "its",
+    #     "they",
+    #     "them",
+    #     "their"
+    # ]
+
+    # if memory:
+
+    #     last_question = memory[-1]["question"]
+
+    #     if any(
+    #         word in question.lower().split()
+    #         for word in follow_up_words
+    #     ):
+
+    #         question = (
+    #             f"{question} "
+    #             f"Regarding: {last_question}"
+    #         )
+
+    #         print(
+    #             "\nFOLLOW-UP DETECTED:"
+    #         )
+
+    #         print(question)
+
+
+# ------------------------
+# FOLLOW-UP DETECTION
+# ------------------------
+
+    question = request.question
+
+    follow_up_words = [
+        "it",
+        "its",
+        "they",
+        "them",
+        "their"
+    ]
+
+    if memory:
+
+        last_question = None
+
+        for item in reversed(memory):
+
+            previous_question = item[
+                "question"
+            ]
+
+            if (
+                previous_question.lower()
+                != question.lower()
+            ):
+
+                last_question = (
+                    previous_question
+                )
+
+                break
+
+        if (
+            last_question
+            and any(
+                word in question.lower().split()
+                for word in follow_up_words
+            )
+        ):
+
+            question = (
+                f"{question} "
+                f"Regarding: {last_question}"
+            )
+
+            print(
+                "\nFOLLOW-UP DETECTED:"
+            )
+
+            print(
+                question
+            )
+    # ------------------------
+    # INTENT CLASSIFICATION
+    # ------------------------
+
     intent = classify_intent(
-        request.question
+        question
     )
 
     print(f"Intent: {intent}")
@@ -48,9 +144,12 @@ def assistant(request: AssistantRequest):
     # ------------------------
     # GREETING
     # ------------------------
+
     if intent == "GREETING":
 
-        answer = "Hello! How can I help you today?"
+        answer = (
+            "Hello! How can I help you today?"
+        )
 
         save_memory(
             session_id,
@@ -67,6 +166,7 @@ def assistant(request: AssistantRequest):
     # ------------------------
     # SHORT_VAGUE
     # ------------------------
+
     if intent == "SHORT_VAGUE":
 
         answer = (
@@ -89,6 +189,7 @@ def assistant(request: AssistantRequest):
     # ------------------------
     # OUT_OF_SCOPE
     # ------------------------
+
     if intent == "OUT_OF_SCOPE":
 
         answer = (
@@ -115,25 +216,32 @@ def assistant(request: AssistantRequest):
     # ------------------------
 
     tool_names = choose_tools(
-        request.question
+        question
     )
 
-    print(f"Selected Tools: {tool_names}")
+    print(
+        f"Selected Tools: {tool_names}"
+    )
 
     results = []
 
     for tool_name in tool_names:
 
-        tool = TOOLS.get(tool_name)
+        tool = TOOLS.get(
+            tool_name
+        )
 
         if not tool:
             continue
 
         tool_result = tool(
-            request.question
+            question
         )
 
-        print(f"{tool_name} Result:")
+        print(
+            f"{tool_name} Result:"
+        )
+
         print(tool_result)
 
         results.append(
