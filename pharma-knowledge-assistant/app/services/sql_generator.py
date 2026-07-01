@@ -1,47 +1,39 @@
 import requests
+import re
 
 
 def generate_sql(question: str):
 
-#     prompt = f"""
-# You are a SQL expert.
-
-# Convert the user's question into SQLite SQL.
-
-# Table: sales
-
-# Columns:
-# - id
-# - product
-# - country
-# - sales
-
-# Return ONLY the SQL query.
-
-# Question:
-# {question}
-# """
     prompt = f"""
-    You are an SQLite expert.
+You are an SQLite expert.
 
-    Table: sales
+Database Schema
 
-    Columns:
-    - id
-    - product
-    - country
-    - sales
+Table: sales
 
-    Generate ONLY a valid SQLite query.
+Columns
+- id INTEGER
+- product TEXT
+- country TEXT
+- sales REAL
 
-    Do not explain.
-    Do not add markdown.
-    Do not add comments.
-    Do not add any text before or after the SQL.
+Rules
 
-    Question:
-    {question}
-    """
+- Return ONLY one SQL query.
+- Do not explain.
+- Do not use markdown.
+- Do not use ```sql.
+- Do not add comments.
+- The first word of your response must be SELECT.
+- The query must end with a semicolon.
+- Use only the sales table.
+- Never invent columns.
+- Never invent tables.
+
+Question:
+{question}
+"""
+
     response = requests.post(
         "http://localhost:11434/api/generate",
         json={
@@ -53,6 +45,28 @@ def generate_sql(question: str):
 
     response.raise_for_status()
 
-    sql_query = response.json()["response"]
+    raw_response = response.json()["response"]
 
-    return sql_query.strip()
+    print("\n==============================")
+    print("RAW SQL RESPONSE")
+    print("==============================")
+    print(raw_response)
+
+    # Extract SQL statement
+    match = re.search(
+        r"(SELECT|INSERT|UPDATE|DELETE).*?;",
+        raw_response,
+        re.IGNORECASE | re.DOTALL
+    )
+
+    if match:
+        sql_query = match.group(0).strip()
+    else:
+        sql_query = raw_response.strip()
+
+    print("\n==============================")
+    print("EXTRACTED SQL")
+    print("==============================")
+    print(sql_query)
+
+    return sql_query

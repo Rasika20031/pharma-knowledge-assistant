@@ -13,6 +13,11 @@ into a more specific search query.
 
 Return ONLY the rewritten query.
 
+Do not explain.
+Do not use markdown.
+Do not add quotes.
+Do not say "Here is the rewritten query".
+
 Question:
 {question}
 """

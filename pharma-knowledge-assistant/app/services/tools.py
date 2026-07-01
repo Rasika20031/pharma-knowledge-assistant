@@ -94,16 +94,21 @@ def rag_tool(question: str):
     }
 
 
-
 def sql_tool(question: str):
 
-    sql_query = generate_sql(
-        question
-    )
+    print("\n==========================")
+    print("SQL TOOL")
+    print("==========================")
 
-    result = execute_sql(
-        sql_query
-    )
+    sql_query = generate_sql(question)
+
+    print("\nGenerated SQL:")
+    print(sql_query)
+
+    result = execute_sql(sql_query)
+
+    print("\nSQL Result:")
+    print(result)
 
     answer = generate_sql_answer(
         question,
@@ -111,8 +116,12 @@ def sql_tool(question: str):
         result
     )
 
+    print("\nGenerated Answer:")
+    print(answer)
+
     return {
         "sql": sql_query,
         "result": result,
-        "answer": answer
+        "answer": answer,
+        "source": "sales.db"
     }

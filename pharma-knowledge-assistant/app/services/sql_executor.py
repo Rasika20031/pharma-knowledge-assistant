@@ -9,10 +9,20 @@ def execute_sql(sql_query: str):
 
     cursor = conn.cursor()
 
-    cursor.execute(sql_query)
+    try:
 
-    rows = cursor.fetchall()
+        cursor.execute(sql_query)
 
-    conn.close()
+        rows = cursor.fetchall()
+
+    except Exception as e:
+
+        print(f"SQL Execution Error: {e}")
+
+        rows = []
+
+    finally:
+
+        conn.close()
 
     return rows

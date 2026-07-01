@@ -8,7 +8,7 @@ def calculator_tool(question: str):
     expression = expression.replace("what is", "")
     expression = expression.replace("calculate", "")
 
-    # keep only numbers and operators
+    # Keep only numbers and operators
     expression = re.sub(
         r"[^0-9+\-*/(). ]",
         "",
@@ -21,10 +21,18 @@ def calculator_tool(question: str):
 
         result = eval(expression)
 
-        return f"The answer is {result}"
+        return {
+            "expression": expression,
+            "result": result,
+            "answer": f"The answer is {result}"
+        }
 
     except Exception as e:
 
         print(f"Calculator Error: {e}")
 
-        return "Unable to calculate."
+        return {
+            "expression": expression,
+            "result": None,
+            "answer": "Unable to calculate."
+        }

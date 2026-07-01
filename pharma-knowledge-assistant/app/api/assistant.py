@@ -2,9 +2,12 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
 import uuid
+from app.services.planner import create_plan
+from app.services.executor import execute_plan
+# from app.services.agent import choose_tools
+# from app.services.tool_registry import TOOLS
 
-from app.services.agent import choose_tools
-from app.services.tool_registry import TOOLS
+from app.services.response_generator import generate_response
 
 from app.services.intent_classifier import (
     classify_intent
@@ -41,39 +44,6 @@ def assistant(request: AssistantRequest):
     print("\nMEMORY:")
     print(memory)
 
-    # ------------------------
-    # FOLLOW-UP DETECTION
-    # ------------------------
-
-    # question = request.question
-
-    # follow_up_words = [
-    #     "it",
-    #     "its",
-    #     "they",
-    #     "them",
-    #     "their"
-    # ]
-
-    # if memory:
-
-    #     last_question = memory[-1]["question"]
-
-    #     if any(
-    #         word in question.lower().split()
-    #         for word in follow_up_words
-    #     ):
-
-    #         question = (
-    #             f"{question} "
-    #             f"Regarding: {last_question}"
-    #         )
-
-    #         print(
-    #             "\nFOLLOW-UP DETECTED:"
-    #         )
-
-    #         print(question)
 
 
 # ------------------------
@@ -131,6 +101,10 @@ def assistant(request: AssistantRequest):
             print(
                 question
             )
+    
+
+
+
     # ------------------------
     # INTENT CLASSIFICATION
     # ------------------------
@@ -140,6 +114,32 @@ def assistant(request: AssistantRequest):
     )
 
     print(f"Intent: {intent}")
+
+
+
+
+
+    # ------------------------
+    # EXECUTION PLAN
+    # ------------------------
+
+    plan = create_plan(
+        question,
+        intent
+    )
+
+    print("\n==============================")
+    print("EXECUTION PLAN")
+    print("==============================")
+
+    for index, step in enumerate(
+        plan["steps"],
+        start=1
+    ):
+
+        print(
+            f"Step {index}: {step}"
+        )
 
     # ------------------------
     # GREETING
@@ -215,47 +215,17 @@ def assistant(request: AssistantRequest):
     # CALCULATION / COMPLEX
     # ------------------------
 
-    tool_names = choose_tools(
-        question
+    tool_names, results = execute_plan(
+        question,
+        plan
     )
-
-    print(
-        f"Selected Tools: {tool_names}"
-    )
-
-    results = []
-
-    for tool_name in tool_names:
-
-        tool = TOOLS.get(
-            tool_name
-        )
-
-        if not tool:
-            continue
-
-        tool_result = tool(
-            question
-        )
-
-        print(
-            f"{tool_name} Result:"
-        )
-
-        print(tool_result)
-
-        results.append(
-            {
-                "tool": tool_name,
-                "result": tool_result
-            }
-        )
-
+    final_answer = generate_response(results)
     save_memory(
         session_id,
         request.question,
-        str(results)
+        final_answer
     )
+    
 
     return {
         "session_id": session_id,
@@ -263,6 +233,8 @@ def assistant(request: AssistantRequest):
             get_memory(session_id)
         ),
         "intent": intent,
+        "plan": plan,
         "tools_used": tool_names,
+        "answer": final_answer,
         "results": results
     }

@@ -10,7 +10,13 @@ def generate_sql_answer(
     prompt = f"""
 You are a pharmaceutical business assistant.
 
-Convert the SQL result into a natural language answer.
+Use ONLY the SQL Result.
+
+Do not hallucinate.
+
+If SQL Result is empty,
+say that no matching records were found.
+
 
 Question:
 {question}

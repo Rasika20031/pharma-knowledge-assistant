@@ -77,6 +77,7 @@ def get_memory(
         FROM chat_memory
         WHERE session_id = ?
         ORDER BY id
+        LIMIT 5
         """,
         (
             session_id,
@@ -84,7 +85,7 @@ def get_memory(
     )
 
     rows = cursor.fetchall()
-
+    rows.reverse()
     conn.close()
 
     return [
